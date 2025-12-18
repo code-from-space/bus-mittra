@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard | BUS Mittra</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h2 {
+      margin-bottom: 10px;
+    }
+    .complaint {
+      border: 1px solid #ccc;
+      padding: 12px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      background: #f9f9f9;
+    }
+    .complaint small {
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Admin Dashboard</h2>
+<p>All Passenger Complaints</p>
+
+<button onclick="logout()">Logout</button>
+<hr>
+
+<div id="complaintsList">
+  <p>Loading complaints...</p>
+</div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<!-- Your Firebase config -->
+<script src="../js/firebase.js"></script>
+
+
+<script>
+  // Protect admin page + role check
+  auth.onAuthStateChanged(async user => {
+    if (!user) {
+      window.location.href = "../auth/login.html";
+      return;
+    }
+
+    const doc = await db.collection("users").doc(user.uid).get();
+    if (doc.data().role !== "admin") {
+      alert("Access denied");
+      window.location.href = "../auth/login.html";
+      return;
+    }
+
+    loadComplaints();
+  });
+
+  // Load complaints from Firestore
+  function loadComplaints() {
+    db.collection("complaints")
+      .orderBy("timestamp", "desc")
+      .onSnapshot(snapshot => {
+        const container = document.getElementById("complaintsList");
+        container.innerHTML = "";
+
+        if (snapshot.empty) {
+          container.innerHTML = "<p>No complaints found.</p>";
+          return;
+        }
+
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const div = document.createElement("div");
+          div.className = "complaint";
+
+          div.innerHTML = `
+            <strong>Bus Number:</strong> ${data.busNumber}<br>
+            <strong>Complaint:</strong> ${data.message}<br>
+            <small>User ID: ${data.userId}</small><br>
+            <small>Date: ${data.timestamp?.toDate()}</small>
+          `;
+
+          container.appendChild(div);
+        });
+      });
+  }
+
+  function logout() {
+    auth.signOut().then(() => {
+      window.location.href = "../auth/login.html";
+    });
+  }
+</script>
+
+</body>
+</html>

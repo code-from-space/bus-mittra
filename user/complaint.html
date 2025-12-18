@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Submit Complaint | BUS Mittra</title>
+</head>
+<body>
+
+<h2>Submit Complaint</h2>
+
+<input type="text" id="busNumber" placeholder="Bus Number"><br><br>
+<textarea id="message" placeholder="Describe your issue"></textarea><br><br>
+
+<button onclick="submitComplaint()">Submit</button>
+<button onclick="window.location.href='dashboard.html'">Back</button>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script src="../js/firebase.js"></script>
+
+<script>
+function submitComplaint() {
+  const busNumber = document.getElementById("busNumber").value;
+  const message = document.getElementById("message").value;
+
+  if (!busNumber || !message) {
+    alert("Please fill all fields");
+    return;
+  }
+
+  auth.onAuthStateChanged((user) => {
+    if (!user) return;
+
+    db.collection("complaints").add({
+      busNumber: busNumber,
+      message: message,
+      userId: user.uid,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+      alert("Complaint submitted successfully");
+      window.location.href = "dashboard.html";
+    });
+  });
+}
+</script>
+
+</body>
+</html>

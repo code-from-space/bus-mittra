@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Dashboard | BUS Mittra</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body class="gradient-bg">
+
+  <!-- HEADER -->
+  <header class="top-bar">
+    <h2 id="welcome">Welcome</h2>
+  </header>
+
+  <!-- BUS SELECTION -->
+  <section class="card">
+    <h3>Select Your Bus</h3>
+    <select id="busSelect">
+      <option>Loading buses...</option>
+    </select>
+  </section>
+
+  <!-- MAP -->
+  <section class="card">
+    <h3>Live Bus Location</h3>
+    <div id="map"></div>
+  </section>
+
+  <!-- ACTIONS -->
+  <section class="card">
+    <a href="complaint.html" class="action-btn">Submit Complaint</a>
+  </section>
+
+  <!-- LOGOUT -->
+  <button class="logout-btn" onclick="logout()">Logout</button>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <!-- Firebase config -->
+  <script src="../js/firebase.js"></script>
+
+  <!-- Google Maps -->
+  <script src="https://maps.googleapis.com/maps/api/js?AIzaSyD_R4puRKEoneWa6i5UNl7Kmi-XU-d_Fek"></script>
+
+
+  <!-- Dashboard Logic -->
+  <script>
+    let map, marker;
+
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) {
+        window.location.href = "../auth/login.html";
+        return;
+      }
+
+      document.getElementById("welcome").innerText =
+        "Welcome to BUS Mittra, " + user.email;
+
+      loadBuses();
+      initMap();
+    });
+
+    async function loadBuses() {
+      const select = document.getElementById("busSelect");
+      select.innerHTML = "<option>Select a bus</option>";
+
+      const snapshot = await db.collection("buses")
+        .where("active", "==", true)
+        .get();
+
+      snapshot.forEach(doc => {
+        const bus = doc.data();
+        select.innerHTML += `
+          <option data-lat="${bus.lat}" data-lng="${bus.lng}">
+            Bus ${bus.number} – ${bus.route}
+          </option>`;
+      });
+
+      select.onchange = () => {
+        const opt = select.options[select.selectedIndex];
+        showBus(opt.dataset.lat, opt.dataset.lng);
+      };
+    }
+
+    function initMap(lat = 26.9124, lng = 75.7873) {
+      map = new google.maps.Map(document.getElementById("map"), {
+        center: { lat, lng },
+        zoom: 14
+      });
+
+      marker = new google.maps.Marker({
+        map: map,
+        position: { lat, lng }
+      });
+    }
+
+    function showBus(lat, lng) {
+      lat = parseFloat(lat);
+      lng = parseFloat(lng);
+
+      marker.setPosition({ lat, lng });
+      map.panTo({ lat, lng });
+
+      simulateMovement(lat, lng);
+    }
+
+    function simulateMovement(lat, lng) {
+      setInterval(() => {
+        lat += (Math.random() - 0.5) * 0.001;
+        lng += (Math.random() - 0.5) * 0.001;
+
+        const pos = { lat, lng };
+        marker.setPosition(pos);
+        map.panTo(pos);
+      }, 3000);
+    }
+
+    function logout() {
+      auth.signOut().then(() => {
+        window.location.href = "../auth/login.html";
+      });
+    }
+  </script>
+
+</body>
+</html>
