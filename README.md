@@ -8,9 +8,15 @@ BUS MITTRA is a smart web-based platform designed to improve public transport ex
 ---
 
 ## 🚀 Live Demo
-🔗 **Hosted on Firebase**  
-👉 https://bus-mittra.web.app
-👉https://code-from-space.github.io/bus-mittra/
+
+🔗 **Hosted on Firebase & GitHub Pages**
+
+- 🌐 **Firebase Hosting**  
+  https://bus-mittra.web.app
+
+- 💻 **GitHub Pages**  
+  https://code-from-space.github.io/bus-mittra/
+
 ---
 
 ## ✨ Features
@@ -136,6 +142,7 @@ alerts (collection)
    - 🧑‍🎓 User → User Dashboard
    - 🧑‍✈️ Driver → Driver Dashboard
    - 🧑‍💼 Admin → Admin Panel
+
 4️⃣ User selects a bus  
 5️⃣ Live bus location is fetched from Firestore  
 6️⃣ Google Maps displays real-time marker updates  
