@@ -1,49 +1,38 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Submit Complaint | BUS Mittra</title>
+  <title>Submit Complaint</title>
+  <link rel="stylesheet" href="../css/style.css">
 </head>
-<body>
 
-<h2>Submit Complaint</h2>
+<body class="center-page">
 
-<input type="text" id="busNumber" placeholder="Bus Number"><br><br>
-<textarea id="message" placeholder="Describe your issue"></textarea><br><br>
+  <div class="complaint-card">
+    <h2>📝 Submit Complaint</h2>
 
-<button onclick="submitComplaint()">Submit</button>
-<button onclick="window.location.href='dashboard.html'">Back</button>
+    <input id="complaintTitle" placeholder="Complaint title" />
+    
+    <textarea
+      id="complaintMessage"
+      placeholder="Describe your issue..."
+      rows="5"
+    ></textarea>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <button onclick="submitComplaint()">Submit</button>
 
-<script src="../js/firebase.js"></script>
+    <a href="dashboard.html" class="back-link">← Back to Dashboard</a>
+  </div>
 
-<script>
-function submitComplaint() {
-  const busNumber = document.getElementById("busNumber").value;
-  const message = document.getElementById("message").value;
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-  if (!busNumber || !message) {
-    alert("Please fill all fields");
-    return;
-  }
+  <script src="../js/firebase.js"></script>
+  <script src="../js/app.js"></script>
 
-  auth.onAuthStateChanged((user) => {
-    if (!user) return;
+  
 
-    db.collection("complaints").add({
-      busNumber: busNumber,
-      message: message,
-      userId: user.uid,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
-      alert("Complaint submitted successfully");
-      window.location.href = "dashboard.html";
-    });
-  });
-}
-</script>
 
 </body>
 </html>

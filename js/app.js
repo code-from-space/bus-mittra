@@ -25,3 +25,78 @@ function login() {
     window.location.href = "admin.html";
   }
 }
+
+
+const busSelect = document.getElementById("busSelect");
+
+db.collection("buses")
+  .where("status", "==", "active")
+  .onSnapshot((snapshot) => {
+    busSelect.innerHTML = `<option value="">Select a bus</option>`;
+
+    snapshot.forEach((doc) => {
+      const bus = doc.data();
+      const option = document.createElement("option");
+
+      option.value = doc.id;
+      option.textContent = `Bus ${bus.busNumber} — ${bus.route}`;
+
+      busSelect.appendChild(option);
+    });
+  });
+
+
+  function submitComplaint() {
+  const title = document.getElementById("complaintTitle").value;
+  const message = document.getElementById("complaintMessage").value;
+
+  const user = auth.currentUser;
+  if (!user) return alert("Not logged in");
+
+  db.collection("complaints").add({
+    userId: user.uid,
+    email: user.email,
+    title: title,
+    message: message,
+    status: "pending",
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  })
+  .then(() => {
+    alert("Complaint submitted");
+    window.location.href = "dashboard.html";
+  })
+  .catch(err => alert(err.message));
+}
+
+function submitComplaint() {
+  const title = document.getElementById("complaintTitle").value;
+  const message = document.getElementById("complaintMessage").value;
+
+  if (!title || !message) {
+    alert("Please fill all fields");
+    return;
+  }
+
+  firebase.auth().onAuthStateChanged((user) => {
+    if (!user) {
+      alert("You must be logged in");
+      return;
+    }
+
+    firebase.firestore().collection("complaints").add({
+      userId: user.uid,
+      email: user.email,
+      title: title,
+      message: message,
+      status: "open",
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    })
+    .then(() => {
+      alert("Complaint submitted successfully");
+      window.location.href = "dashboard.html";
+    })
+    .catch((error) => {
+      alert(error.message);
+    });
+  });
+}
